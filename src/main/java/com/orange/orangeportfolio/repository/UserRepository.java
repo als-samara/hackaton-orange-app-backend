@@ -8,5 +8,5 @@ import com.orange.orangeportfolio.model.User;
 
 public interface UserRepository extends JpaRepository<User, Long>{
 	
-	public Optional<User> findByUsuario(String user);
+	public Optional<User> findByEmail(String email);
 }
