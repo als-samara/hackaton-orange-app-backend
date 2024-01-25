@@ -2,7 +2,9 @@ package com.orange.orangeportfolio.mapper;
 
 import org.springframework.stereotype.Component;
 
+import com.orange.orangeportfolio.dto.UserCreateDTO;
 import com.orange.orangeportfolio.dto.UserDTO;
+import com.orange.orangeportfolio.dto.UserUpdateDTO;
 import com.orange.orangeportfolio.model.User;
 
 @Component
@@ -12,18 +14,24 @@ public class UserMapper {
 		var userDTO = new UserDTO(
 				user.getId(),
 				user.getName(), 
-				user.getEmail(),
-				user.getPassword());
-		
+				user.getEmail());
+				
 		return userDTO;
 	}
 	
-	public User toUser(UserDTO userDTO) {
-		var user = new User(
-				userDTO.id(), 
-				userDTO.name(), 
-				userDTO.email(), 
-				userDTO.password());
+	public User toUser(UserCreateDTO userCreateDTO) {
+		var user = new User( 
+				null,
+				userCreateDTO.name(), 
+				userCreateDTO.email(), 
+				userCreateDTO.password());
+		
+		return user;
+	}
+	
+	public User toUser(UserUpdateDTO userUpdateDTO, User user){
+		user.setName(userUpdateDTO.name());
+		user.setEmail(userUpdateDTO.email());
 		
 		return user;
 	}

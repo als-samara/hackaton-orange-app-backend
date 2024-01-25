@@ -1,12 +1,18 @@
 package com.orange.orangeportfolio.service;
 
+import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpClientErrorException;
 
+import com.orange.orangeportfolio.dto.UserCreateDTO;
 import com.orange.orangeportfolio.dto.UserDTO;
+import com.orange.orangeportfolio.dto.UserUpdateDTO;
 import com.orange.orangeportfolio.mapper.UserMapper;
 import com.orange.orangeportfolio.repository.UserRepository;
+import com.orange.orangeportfolio.service.exception.UserInvalidPropertyException;
+import com.orange.orangeportfolio.service.exception.UserNotFoundException;
 
 @Service
 public class UserService {
@@ -16,18 +22,11 @@ public class UserService {
 	@Autowired
 	private UserMapper userMapper;
 	
-	public UserDTO create(UserDTO user) throws Exception {
-		if(!StringUtils.hasText(user.name())) {
-			throw new Exception();
-		}
+	public UserDTO create(UserCreateDTO user) throws HttpClientErrorException {
 		
-		if(!StringUtils.hasText(user.email())) {
-			throw new Exception();
-		}
-		
-		if(!StringUtils.hasText(user.password())) {
-			throw new Exception();
-		}
+		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.name, user.name());
+		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.email, user.email());
+		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.password, user.password());
 		
 		var userEntity =  userMapper.toUser(user);
 		userEntity = userRepository.save(userEntity);
@@ -37,49 +36,34 @@ public class UserService {
 		return createdUser;
 	}
 	
-	public UserDTO getById(Long id) throws Exception {
-		var user = userRepository.findById(id);
+	public UserDTO getById(Long id) throws HttpClientErrorException {
+		var user = userRepository.findById(id);	
 		
-		if(user.isEmpty()) {
-			throw new Exception();
-		}
+		UserNotFoundException.ThrowIfIsEmpty(user);
 		
 		return userMapper.toDTO(user.get());
 	}
 	
-	public void deleteById(Long id) throws Exception {
+	public void deleteById(Long id) throws HttpClientErrorException {
 		var user = userRepository.findById(id);
 		
-		if(user.isEmpty()) {
-			throw new Exception();
-		}
+		UserNotFoundException.ThrowIfIsEmpty(user);
 		
 		userRepository.deleteById(id);
 	}
 	
-	public UserDTO update(Long id, UserDTO user) throws Exception {
-		if(!StringUtils.hasText(user.name())) {
-			throw new Exception();
-		}
-		
-		if(!StringUtils.hasText(user.email())) {
-			throw new Exception();
-		}
-		
-		if(!StringUtils.hasText(user.password())) {
-			throw new Exception();
-		}
+	public UserDTO update(Long id, UserUpdateDTO user) throws HttpClientErrorException {
+
+		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserUpdateDTO.Fields.name, user.name());
+		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserUpdateDTO.Fields.email, user.email());
 		
 		var result = userRepository.findById(id);
 		
-		if(result.isEmpty()) {
-			throw new Exception();
-		}
-		var userEntity = result.get();
+		UserNotFoundException.ThrowIfIsEmpty(result);
 		
-		userEntity.setName(user.name());
-		userEntity.setEmail(user.email());
-		userEntity.setPassword(user.password());
+		var userEntity = result.get();
+	
+		userEntity = userMapper.toUser(user, userEntity);
 		
 		userEntity = userRepository.save(userEntity);
 		
