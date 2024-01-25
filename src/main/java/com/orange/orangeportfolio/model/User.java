@@ -28,6 +28,6 @@ public class User {
 	private String name;
 	@Email
 	private String email;
-	@Size(min = 5, message = "The title attribute must contain at least 5 characters")
+	@Size(min = 8, message = "The title attribute must contain at least 5 characters")
 	private String password;
 }
