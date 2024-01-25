@@ -1,18 +1,19 @@
 package com.orange.orangeportfolio.model;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 
+@Entity
+@Data
 @Table(name = "tb_projects")
 public class Project {
 	
@@ -33,60 +34,7 @@ public class Project {
 	
 	private String link;
 	
-	@ManyToMany(mappedBy = "projects") // falta criar get e set
-	private Set<Tag> tags = new HashSet<>();
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getPhoto() {
-		return photo;
-	}
-
-	public void setPhoto(String photo) {
-		this.photo = photo;
-	}
-
-	
-	public String getLink() {
-		return link;
-	}
-
-	
-	public void setLink(String link) {
-		this.link = link;
-	}
-
-	
-	public Set<Tag> getTags() {
-		return tags;
-	}
-
-	
-	public void setTags(Set<Tag> tags) {
-		this.tags = tags;
-	}
+	private List<String> tags;
 	
 	
 	
