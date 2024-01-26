@@ -1,14 +1,18 @@
 package com.orange.orangeportfolio.mapper;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.orange.orangeportfolio.dto.UserCreateDTO;
 import com.orange.orangeportfolio.dto.UserDTO;
 import com.orange.orangeportfolio.dto.UserUpdateDTO;
+import com.orange.orangeportfolio.dto.UserUpdatePasswordDTO;
 import com.orange.orangeportfolio.model.User;
 
 @Component
 public class UserMapper {
+	
+	private static BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 	
 	public UserDTO toDTO(User user) {
 		var userDTO = new UserDTO(
@@ -20,11 +24,14 @@ public class UserMapper {
 	}
 	
 	public User toUser(UserCreateDTO userCreateDTO) {
+		
+		var passwordHash = encoder.encode(userCreateDTO.password());
+		
 		var user = new User( 
 				null,
 				userCreateDTO.name(), 
 				userCreateDTO.email(), 
-				userCreateDTO.password());
+				passwordHash);
 		
 		return user;
 	}
@@ -34,5 +41,14 @@ public class UserMapper {
 		user.setEmail(userUpdateDTO.email());
 		
 		return user;
+	}
+	
+	public User toUser(UserUpdatePasswordDTO userUpdatePasswordDTO, User user) {
+		
+		var passwordHash = encoder.encode(userUpdatePasswordDTO.password());
+		
+		user.setPassword(passwordHash);
+	
+		return user;		
 	}
 }

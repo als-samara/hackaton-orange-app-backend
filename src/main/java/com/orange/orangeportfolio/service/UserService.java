@@ -1,161 +1,148 @@
 package com.orange.orangeportfolio.service;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.orange.orangeportfolio.dto.UserCreateDTO;
 import com.orange.orangeportfolio.dto.UserDTO;
+import com.orange.orangeportfolio.dto.UserLoginDTO;
+import com.orange.orangeportfolio.dto.UserTokenDTO;
 import com.orange.orangeportfolio.dto.UserUpdateDTO;
+import com.orange.orangeportfolio.dto.UserUpdatePasswordDTO;
 import com.orange.orangeportfolio.mapper.UserMapper;
-import com.orange.orangeportfolio.model.User;
-import com.orange.orangeportfolio.model.UserLogin;
 import com.orange.orangeportfolio.repository.UserRepository;
 import com.orange.orangeportfolio.security.JwtService;
+import com.orange.orangeportfolio.service.exception.FailedAuthenticationException;
 import com.orange.orangeportfolio.service.exception.UserInvalidPropertyException;
 import com.orange.orangeportfolio.service.exception.UserNotFoundException;
+import com.orange.orangeportfolio.service.exception.UserWithSameEmailAlreadyCreatedException;
 
 @Service
 public class UserService {
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private UserMapper userMapper;
-	
+
+	@Autowired
+	private JwtService jwtService;
+
+	@Autowired
+	private AuthenticationManager authenticationManager;
+
 	public UserDTO create(UserCreateDTO user) throws HttpClientErrorException {
-		
+
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.name, user.name());
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.email, user.email());
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.password, user.password());
-		
-		var userEntity =  userMapper.toUser(user);
+
+		ValidateEmailDuplication(user.email());
+
+		var userEntity = userMapper.toUser(user);
 		userEntity = userRepository.save(userEntity);
-		
+
 		var createdUser = userMapper.toDTO(userEntity);
-		
+
 		return createdUser;
 	}
-	
+
 	public UserDTO getById(Long id) throws HttpClientErrorException {
-		var user = userRepository.findById(id);	
-		
+		var user = userRepository.findById(id);
+
 		UserNotFoundException.ThrowIfIsEmpty(user);
-		
+
 		return userMapper.toDTO(user.get());
 	}
-	
+
 	public void deleteById(Long id) throws HttpClientErrorException {
 		var user = userRepository.findById(id);
-		
+
 		UserNotFoundException.ThrowIfIsEmpty(user);
-		
+
 		userRepository.deleteById(id);
 	}
-	
+
 	public UserDTO update(Long id, UserUpdateDTO user) throws HttpClientErrorException {
 
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserUpdateDTO.Fields.name, user.name());
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserUpdateDTO.Fields.email, user.email());
-		
+
+		ValidateEmailDuplication(user.email(), id);
+
 		var result = userRepository.findById(id);
-		
+
 		UserNotFoundException.ThrowIfIsEmpty(result);
-		
+
 		var userEntity = result.get();
-	
 		userEntity = userMapper.toUser(user, userEntity);
-		
 		userEntity = userRepository.save(userEntity);
-		
+
 		var updatedUser = userMapper.toDTO(userEntity);
-		
+
 		return updatedUser;
 	}
-
-	@Autowired
-    private JwtService jwtService;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-	public Optional<User> cadastrarUsuario(User user) {
-
-		if (userRepository.findByEmail(user.getEmail()).isPresent())
-			return Optional.empty();
-
-		user.setPassword(encodePassword(user.getPassword()));
-
-		return Optional.of(userRepository.save(user));
 	
+	public void updatePassword(Long id, UserUpdatePasswordDTO password) {
+		var user = userRepository.findById(id);
+		
+		UserNotFoundException.ThrowIfIsEmpty(user);
+		
+		var updatedPasswordUser = userMapper.toUser(password, user.get());
+		
+		updatedPasswordUser = userRepository.save(updatedPasswordUser);
 	}
 
-	public Optional<User> atualizarUsuario(User user) {
+	public UserTokenDTO authenticate(UserLoginDTO userLogin) throws Exception {
+
+		var credentials = new UsernamePasswordAuthenticationToken(
+				userLogin.email(),
+				userLogin.password());
 		
-		if(userRepository.findById(user.getId()).isPresent()) {
+		Authentication authentication = authenticationManager.authenticate(credentials);
+		
+		if(!authentication.isAuthenticated()) {
+			throw new FailedAuthenticationException();
+		}
+		
+		var token = gerarToken(userLogin.email());
+		var userToken = new UserTokenDTO(token);
+		
+		return userToken;
+	}
 
-			Optional<User> searchUser = userRepository.findByEmail(user.getEmail());
+	private void ValidateEmailDuplication(String email, Long id) {
+		var result = userRepository.findByEmail(email);
 
-			if ( (searchUser.isPresent()) && ( searchUser.get().getId() != user.getId()))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists!", null);
-
-			user.setPassword(encodePassword(user.getPassword()));
-
-			return Optional.ofNullable(userRepository.save(user));
-			
+		if (result.isEmpty()) {
+			return;
 		}
 
-		return Optional.empty();
-	
-	}	
+		var user = result.get();
+		var isSameId = user.getId() == id;
 
-	public Optional<UserLogin> autenticarUsuario(Optional<UserLogin> userLogin) {
-        
-        // Gera o Objeto de autenticação
-		var credentials = new UsernamePasswordAuthenticationToken(userLogin.get().getEmail(), userLogin.get().getPassword());
-		
-        // Autentica o Usuario
-		Authentication authentication = authenticationManager.authenticate(credentials);
-        
-        // Se a autenticação foi efetuada com sucesso
-		if (authentication.isAuthenticated()) {
+		if (!isSameId) {
+			throw new UserWithSameEmailAlreadyCreatedException();
+		}
+	}
 
-            // Busca os dados do usuário
-			Optional<User> user = userRepository.findByEmail(userLogin.get().getEmail());
+	private void ValidateEmailDuplication(String email) {
+		var result = userRepository.findByEmail(email);
 
-            // Se o usuário foi encontrado
-			if (user.isPresent()) {
-
-                // Preenche o Objeto userLogin com os dados encontrados 
-			   userLogin.get().setId(user.get().getId());
-			   userLogin.get().setName(user.get().getName());
-			   userLogin.get().setEmail(user.get().getEmail());
-			   userLogin.get().setToken(gerarToken(userLogin.get().getEmail()));
-			   userLogin.get().setPassword("");
-				
-                 // Retorna o Objeto preenchido
-			   return userLogin;
-			
-			}
-
-        } 
-            
-		return Optional.empty();
-
-    }
+		if (result.isPresent()) {
+			throw new UserWithSameEmailAlreadyCreatedException();
+		}
+	}
 
 	private String encodePassword(String password) {
 
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		
+
 		return encoder.encode(password);
 
 	}
@@ -165,4 +152,3 @@ public class UserService {
 	}
 
 }
-
