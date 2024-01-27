@@ -1,10 +1,6 @@
 package com.orange.orangeportfolio.controller;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +13,10 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import com.orange.orangeportfolio.dto.UserCreateDTO;
 import com.orange.orangeportfolio.dto.UserDTO;
+import com.orange.orangeportfolio.dto.UserLoginDTO;
+import com.orange.orangeportfolio.dto.UserTokenDTO;
 import com.orange.orangeportfolio.dto.UserUpdateDTO;
-import com.orange.orangeportfolio.model.UserLogin;
+import com.orange.orangeportfolio.dto.UserUpdatePasswordDTO;
 import com.orange.orangeportfolio.repository.UserRepository;
 import com.orange.orangeportfolio.service.UserService;
 
@@ -32,34 +30,39 @@ public class UserController {
 	@Autowired
 	private UserRepository userRepository;
 	
-	@GetMapping("/user/{id}")
+	@GetMapping("/{id}")
 	public UserDTO getById(@PathVariable Long id) throws HttpClientErrorException {
 		var user = userService.getById(id);
 		return user;
 	}
 	
-	@PostMapping("/register")
+	@PostMapping
 	public UserDTO post(@RequestBody UserCreateDTO user) throws HttpClientErrorException {
 		var createdUser = userService.create(user);
 		return createdUser;
 	}
 	
 	@PostMapping("/authenticate")
-	public ResponseEntity<UserLogin> autenticarUsuario(@RequestBody Optional<UserLogin> userLogin){
+	public UserTokenDTO authenticateUser(@RequestBody UserLoginDTO userLogin) throws Exception{
 		
-		return userService.autenticarUsuario(userLogin)
-				.map(answer -> ResponseEntity.status(HttpStatus.OK).body(answer))
-				.orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+		var token = userService.authenticate(userLogin);
+		
+		return token;
 	}
 	
-	@PutMapping("/update/{id}")
+	@PutMapping("/{id}")
 	public UserDTO put(@PathVariable Long id, @RequestBody UserUpdateDTO user) throws HttpClientErrorException {
 		var updateUser = userService.update(id, user);
 		return updateUser;
 	}
 	
-	@DeleteMapping("/delete/{id}")
+	@DeleteMapping("/{id}")
 	public void delete(@PathVariable Long id) throws HttpClientErrorException {
 		userService.deleteById(id);
+	}
+	
+	@PutMapping("/{id}/password")
+	public void updatePassword(@PathVariable Long id, @RequestBody UserUpdatePasswordDTO userUpdatePassword) {
+		userService.updatePassword(id, userUpdatePassword);
 	}
 }
