@@ -29,6 +29,9 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
+	@Autowired
+	private UserRepository userRepository;
+	
 	@GetMapping("/user/{id}")
 	public UserDTO getById(@PathVariable Long id) throws HttpClientErrorException {
 		var user = userService.getById(id);
