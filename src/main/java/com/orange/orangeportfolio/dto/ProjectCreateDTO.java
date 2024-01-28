@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.experimental.FieldNameConstants;
 
 @FieldNameConstants
-public record ProjectCreate(
+public record ProjectCreateDTO(
 		String title,
 		String description,
 		String photo,
