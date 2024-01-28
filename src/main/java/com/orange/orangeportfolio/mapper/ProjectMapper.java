@@ -1,10 +1,13 @@
 package com.orange.orangeportfolio.mapper;
 
+import org.springframework.stereotype.Component;
+
 import com.orange.orangeportfolio.dto.ProjectCreateDTO;
 import com.orange.orangeportfolio.dto.ProjectDTO;
 import com.orange.orangeportfolio.dto.ProjectUpdateDTO;
 import com.orange.orangeportfolio.model.Project;
 
+@Component
 public class ProjectMapper {
 
 	public ProjectDTO toDTO(Project project) {
