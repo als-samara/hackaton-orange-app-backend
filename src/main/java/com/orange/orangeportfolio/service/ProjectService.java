@@ -5,12 +5,15 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.orange.orangeportfolio.dto.ProjectCreateDTO;
 import com.orange.orangeportfolio.dto.ProjectDTO;
 import com.orange.orangeportfolio.dto.ProjectUpdateDTO;
 import com.orange.orangeportfolio.mapper.ProjectMapper;
 import com.orange.orangeportfolio.repository.ProjectRepository;
+import com.orange.orangeportfolio.service.exception.ProjectNotFoundException;
+import com.orange.orangeportfolio.service.exception.UserInvalidPropertyException;
 
 @Service
 public class ProjectService {
@@ -21,7 +24,10 @@ public class ProjectService {
 	@Autowired
 	private ProjectMapper projectMapper;
 	
-	public ProjectDTO create(ProjectCreateDTO project) {
+	public ProjectDTO create(ProjectCreateDTO project) throws HttpClientErrorException{
+		
+		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.title, project.title());
+		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.description, project.description());
 		
 		var projectEntity = projectMapper.toProject(project);
 		projectEntity = projectRepository.save(projectEntity);
@@ -31,8 +37,14 @@ public class ProjectService {
 		return createdProject;
 	}
 	
-	public ProjectDTO update(Long id, ProjectUpdateDTO project) {
+	public ProjectDTO update(Long id, ProjectUpdateDTO project) throws HttpClientErrorException{
+		
+		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.title, project.title());
+		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.description, project.description());
+		
 		var result = projectRepository.findById(id);
+		
+		ProjectNotFoundException.ThrowIfIsEmpty(result);
 		
 		var projectEntity = result.get();
 		
@@ -44,8 +56,10 @@ public class ProjectService {
 		return updatedProject;
 	}
 	
-	public ProjectDTO getById(Long id) {
+	public ProjectDTO getById(Long id) throws HttpClientErrorException{
 		var result = projectRepository.findById(id);
+		
+		ProjectNotFoundException.ThrowIfIsEmpty(result);
 		
 		var projectEntity = result.get();
 		
@@ -57,6 +71,8 @@ public class ProjectService {
 	public List<ProjectDTO> getAll(){
 		var projects = projectRepository.findAll();
 		
+		
+		
 		var projectsDTO = projects.stream()
 				.map(project -> projectMapper.toDTO(project))
 				.collect(Collectors.toList());
@@ -64,12 +80,10 @@ public class ProjectService {
 		return projectsDTO;
 	}
 	
-	public void deleteById(Long id) throws Exception{
+	public void deleteById(Long id) throws HttpClientErrorException{
 		var result = projectRepository.findById(id);
 		
-		if(result.isEmpty()) {
-			throw new Exception();
-		}
+		ProjectNotFoundException.ThrowIfIsEmpty(result);
 		
 		projectRepository.deleteById(id);
 	}

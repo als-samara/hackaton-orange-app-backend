@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.orange.orangeportfolio.dto.ProjectCreateDTO;
 import com.orange.orangeportfolio.dto.ProjectDTO;
@@ -23,25 +24,25 @@ public class ProjectController {
 	private ProjectService projectService;
 	
 	@PostMapping
-	public ProjectDTO post(@RequestBody ProjectCreateDTO project) {
+	public ProjectDTO post(@RequestBody ProjectCreateDTO project) throws HttpClientErrorException{
 		var createProject = projectService.create(project);
 		return createProject;
 	}
 	
 	@GetMapping("/{id}")
-	public ProjectDTO getById(@PathVariable Long id) {
+	public ProjectDTO getById(@PathVariable Long id) throws HttpClientErrorException{
 		var project = projectService.getById(id);
 		return project;
 	}
 	
 	@PutMapping("/{id}")
-	public ProjectDTO update(@PathVariable Long id, ProjectUpdateDTO project) {
+	public ProjectDTO update(@PathVariable Long id, @RequestBody ProjectUpdateDTO project) throws HttpClientErrorException{
 		var updateProject = projectService.update(id, project);
 		return updateProject;
 	}
 	
 	@DeleteMapping("/{id}")
-	public void delete(@PathVariable Long id) throws Exception{
+	public void delete(@PathVariable Long id) throws HttpClientErrorException{
 		projectService.deleteById(id);
 	}
 }
