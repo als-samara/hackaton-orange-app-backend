@@ -6,6 +6,7 @@ import com.orange.orangeportfolio.dto.ProjectCreateDTO;
 import com.orange.orangeportfolio.dto.ProjectDTO;
 import com.orange.orangeportfolio.dto.ProjectUpdateDTO;
 import com.orange.orangeportfolio.model.Project;
+import com.orange.orangeportfolio.model.User;
 
 @Component
 public class ProjectMapper {
@@ -17,18 +18,25 @@ public class ProjectMapper {
 				project.getDescription(),
 				project.getPhoto(),
 				project.getLink(),
-				project.getTags());
+				project.getTags(),
+				project.getUser().getId());
 		
 		return projectDTO;
 	}
 	
 	public Project toProject(ProjectCreateDTO projectCreateDTO) {
+		var user = User
+				.builder()
+				.id(projectCreateDTO.userId())
+				.build();
+		
 		var project = Project.builder()
 				.title(projectCreateDTO.title())
 				.description(projectCreateDTO.description())
 				.photo(projectCreateDTO.photo())
 				.link(projectCreateDTO.link())
 				.tags(projectCreateDTO.tags())
+				.user(user)
 				.build();
 		
 		return project;
