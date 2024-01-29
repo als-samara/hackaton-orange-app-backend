@@ -11,4 +11,4 @@ public record ProjectCreateDTO(
 		String photo,
 		String link,
 		List<String> tags,
-		Long userId) {}
+		Long userId) { }

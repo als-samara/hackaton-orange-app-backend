@@ -40,14 +40,14 @@ public class UserControllerTest {
 	@BeforeEach
 	void start() {
 		userRepository.deleteAll();
-		userService.create(new UserCreateDTO("Root", "root@root.com", "rootroot"));
+		userService.create(new UserCreateDTO("Root", "root@root.com", "rootroot", ""));
 	}
 	
 	@Test
 	@DisplayName("Register User")
 	public void itShouldRegisterAUser() {
 		HttpEntity<UserCreateDTO> requestBody = new HttpEntity<UserCreateDTO>(
-				new UserCreateDTO("User Name", "email@email.com", "senha123"));
+				new UserCreateDTO("User Name", "email@email.com", "senha123", ""));
 		
 		HttpEntity<UserCreateDTO> responseBody = testRestTemplate.exchange("/api/users/register", HttpMethod.POST, requestBody, UserCreateDTO.class);
 		
@@ -57,7 +57,7 @@ public class UserControllerTest {
 	@Test
 	@DisplayName("Find a User searching by its ID")
 	public void itShouldFindUserById() {
-		UserCreateDTO userCreateDTO = new UserCreateDTO("Test User", "user@test.com", "testuser");
+		UserCreateDTO userCreateDTO = new UserCreateDTO("Test User", "user@test.com", "testuser", "");
 		UserDTO userDTO = userService.create(userCreateDTO);
 		
 		ResponseEntity<UserDTO> response = testRestTemplate
@@ -70,7 +70,7 @@ public class UserControllerTest {
 	@Test
 	@DisplayName("Authenticate User")
 	public void itShouldAuthenticateTheUser() {
-		UserCreateDTO userCreateDTO = new UserCreateDTO("Test User", "user@test.com", "testuser");
+		UserCreateDTO userCreateDTO = new UserCreateDTO("Test User", "user@test.com", "testuser", "");
 		userService.create(userCreateDTO);
 		
 	    String email = "user@test.com";
@@ -94,10 +94,10 @@ public class UserControllerTest {
 	@DisplayName("Update an existing User searching by its Id")
 	public void itShouldUpdateUserInformation() {
 		
-		UserCreateDTO userCreateDTO = new UserCreateDTO("Test User", "user@test.com", "testuser");
+		UserCreateDTO userCreateDTO = new UserCreateDTO("Test User", "user@test.com", "testuser", "");
 		UserDTO userDTO = userService.create(userCreateDTO);
 								
-		HttpEntity<UserUpdateDTO> requestBody = new HttpEntity<UserUpdateDTO>(new UserUpdateDTO("Updated Test User", "user@test.com"));
+		HttpEntity<UserUpdateDTO> requestBody = new HttpEntity<UserUpdateDTO>(new UserUpdateDTO("Updated Test User", "user@test.com", ""));
 		
 		ResponseEntity<UserUpdateDTO> responseBody = testRestTemplate
 				.withBasicAuth("root@root.com", "rootroot")
@@ -109,7 +109,7 @@ public class UserControllerTest {
 	@Test
 	@DisplayName("Update Password")
 	public void itShouldUpdatePassword() {
-		UserCreateDTO userCreateDTO = new UserCreateDTO("Test User", "user@test.com", "testuser");
+		UserCreateDTO userCreateDTO = new UserCreateDTO("Test User", "user@test.com", "testuser", "");
 		UserDTO userDTO = userService.create(userCreateDTO);
 		
 		HttpEntity<UserUpdatePasswordDTO> requestBody = new HttpEntity<UserUpdatePasswordDTO>(new UserUpdatePasswordDTO("Updated Password"));
@@ -129,7 +129,7 @@ public class UserControllerTest {
 	@Test
 	@DisplayName("Delete User searching by its Id")
 	public void itShouldDeleteTheUser() {
-		UserCreateDTO userCreateDTO = new UserCreateDTO("Test User", "user@test.com", "testuser");
+		UserCreateDTO userCreateDTO = new UserCreateDTO("Test User", "user@test.com", "testuser", "");
 		UserDTO userDTO = userService.create(userCreateDTO);
 		
 		ResponseEntity<UserDTO> response = testRestTemplate
@@ -142,5 +142,7 @@ public class UserControllerTest {
 	// TODO: evitar email duplicado
 	
 	// TODO: listar todos (depois do teste, criar o método)
+	
+	// TODO: retorna o user pelo id do projeto
 	
 }
