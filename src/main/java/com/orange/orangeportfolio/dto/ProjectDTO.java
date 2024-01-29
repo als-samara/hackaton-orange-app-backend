@@ -2,6 +2,8 @@ package com.orange.orangeportfolio.dto;
 
 import java.util.List;
 
+import com.orange.orangeportfolio.model.User;
+
 import lombok.experimental.FieldNameConstants;
 
 @FieldNameConstants
@@ -11,4 +13,5 @@ public record ProjectDTO(
 		String description,
 		String photo,
 		String link,
-		List<String> tags) {}
+		List<String> tags,
+		Long userId) {}

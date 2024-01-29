@@ -18,7 +18,8 @@ public class UserMapper {
 		var userDTO = new UserDTO(
 				user.getId(),
 				user.getName(), 
-				user.getEmail());
+				user.getEmail(),
+				user.getPhoto());
 				
 		return userDTO;
 	}
@@ -27,11 +28,12 @@ public class UserMapper {
 		
 		var passwordHash = encoder.encode(userCreateDTO.password());
 		
-		var user = new User( 
-				null,
-				userCreateDTO.name(), 
-				userCreateDTO.email(), 
-				passwordHash);
+		var user = User.builder()
+				.name(userCreateDTO.name())
+				.email(userCreateDTO.email())
+				.password(passwordHash)
+				.photo(userCreateDTO.photo())
+				.build();
 		
 		return user;
 	}
@@ -39,6 +41,7 @@ public class UserMapper {
 	public User toUser(UserUpdateDTO userUpdateDTO, User user){
 		user.setName(userUpdateDTO.name());
 		user.setEmail(userUpdateDTO.email());
+		user.setPhoto(userUpdateDTO.photo());
 		
 		return user;
 	}
