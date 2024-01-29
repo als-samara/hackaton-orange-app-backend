@@ -2,8 +2,6 @@ package com.orange.orangeportfolio.dto;
 
 import java.util.List;
 
-import com.orange.orangeportfolio.model.User;
-
 import lombok.experimental.FieldNameConstants;
 
 @FieldNameConstants
