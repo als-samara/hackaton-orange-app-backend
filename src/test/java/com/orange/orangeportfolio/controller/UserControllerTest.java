@@ -140,6 +140,20 @@ public class UserControllerTest {
 	}
 	
 	// TODO: evitar email duplicado
+	@Test
+	@DisplayName("Prevent Duplicate Emails")
+	public void itShouldPreventHavingDuplicateEmails() {
+		userService.create(new UserCreateDTO("Test User", "user@test.com", "testuser", ""));
+		
+		HttpEntity<UserCreateDTO> requestBody = new HttpEntity<UserCreateDTO>(
+				new UserCreateDTO("Test User", "user@test.com", "testuser", ""));
+		
+		ResponseEntity<UserDTO> responseBody = testRestTemplate
+				.withBasicAuth("root@root.com", "rootroot")
+				.exchange("/api/users/register", HttpMethod.POST, requestBody, UserDTO.class);
+		
+		assertEquals(HttpStatus.BAD_REQUEST, responseBody.getStatusCode());
+	}
 	
 	// TODO: listar todos (depois do teste, criar o método)
 	

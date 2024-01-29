@@ -3,6 +3,7 @@ package com.orange.orangeportfolio.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -99,7 +101,41 @@ public class ProjectControllerTest {
 		assertEquals(HttpStatus.OK, responseBody.getStatusCode());
 	}
 	
-	// TODO: delete by id
+	@Test
+	@DisplayName("Delete Project searching by its ID")
+	public void itShouldDeleteTheProjectById() {
+		UserCreateDTO user = new UserCreateDTO("User Name", "email@email.com", "senha123", "");
+		UserDTO userCreated = userService.create(user);
+		ProjectCreateDTO projectCreateDTO = (new ProjectCreateDTO("Project Title", "description X", "", "", Arrays.asList("tag 1"), userCreated.id()));
+		ProjectDTO projectDTO = projectService.create(projectCreateDTO);
+		
+		ResponseEntity<ProjectDTO> response = testRestTemplate
+				.withBasicAuth("root@root.com", "rootroot")
+				.exchange("/api/projects/{id}", HttpMethod.DELETE, null, ProjectDTO.class, projectDTO.id());
+		
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+	}
 	
-	// TODO: get projects by user id
+	@Test
+	@DisplayName("Return User Projects List")
+	public void itShouldReturnUserProjectsList() {
+		
+		//user
+		UserCreateDTO user = new UserCreateDTO("User Name", "email@email.com", "senha123", "");
+		UserDTO userCreated = userService.create(user);
+		
+		// project 1
+		ProjectCreateDTO projectCreateDTO1 = (new ProjectCreateDTO("Project Title 1", "description X", "", "", Arrays.asList("tag 1"), userCreated.id()));
+		ProjectDTO projectDTO1 = projectService.create(projectCreateDTO1);
+		
+		// project 2
+		ProjectCreateDTO projectCreateDTO2 = (new ProjectCreateDTO("Project Title 2", "description X", "", "", Arrays.asList("tag 1"), userCreated.id()));
+		ProjectDTO projectDTO2 = projectService.create(projectCreateDTO2);
+		
+		ResponseEntity<List<ProjectDTO>> response = testRestTemplate
+				.withBasicAuth("root@root.com", "rootroot")
+				.exchange("/api/projects/user/{id}", HttpMethod.GET, null, new ParameterizedTypeReference<List<ProjectDTO>>() {}, userCreated.id());
+		
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+	}
 }
