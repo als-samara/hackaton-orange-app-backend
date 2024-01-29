@@ -71,7 +71,15 @@ public class ProjectService {
 	public List<ProjectDTO> getAll(){
 		var projects = projectRepository.findAll();
 		
+		var projectsDTO = projects.stream()
+				.map(project -> projectMapper.toDTO(project))
+				.collect(Collectors.toList());
 		
+		return projectsDTO;
+	}
+	
+	public List<ProjectDTO> getAllUserById(Long userId){
+		var projects = projectRepository.findAllByUserId(userId);
 		
 		var projectsDTO = projects.stream()
 				.map(project -> projectMapper.toDTO(project))
@@ -87,5 +95,4 @@ public class ProjectService {
 		
 		projectRepository.deleteById(id);
 	}
-	
 }
