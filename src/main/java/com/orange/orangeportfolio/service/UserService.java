@@ -11,6 +11,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import com.orange.orangeportfolio.dto.UserCreateDTO;
 import com.orange.orangeportfolio.dto.UserDTO;
 import com.orange.orangeportfolio.dto.UserLoginDTO;
+import com.orange.orangeportfolio.dto.UserProjectDTO;
 import com.orange.orangeportfolio.dto.UserTokenDTO;
 import com.orange.orangeportfolio.dto.UserUpdateDTO;
 import com.orange.orangeportfolio.dto.UserUpdatePasswordDTO;
@@ -58,6 +59,14 @@ public class UserService {
 		UserNotFoundException.ThrowIfIsEmpty(user);
 
 		return userMapper.toDTO(user.get());
+	}
+	
+	public UserProjectDTO getByIdWithProjects(Long id) throws HttpClientErrorException {
+		var user = userRepository.findById(id);
+
+		UserNotFoundException.ThrowIfIsEmpty(user);
+
+		return userMapper.toUserProjectDTO(user.get());
 	}
 
 	public void deleteById(Long id) throws HttpClientErrorException {

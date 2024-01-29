@@ -1,5 +1,7 @@
 package com.orange.orangeportfolio.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +34,12 @@ public class ProjectController {
 	@GetMapping("/{id}")
 	public ProjectDTO getById(@PathVariable Long id) throws HttpClientErrorException{
 		var project = projectService.getById(id);
+		return project;
+	}
+	
+	@GetMapping("/user/{id}")
+	public List<ProjectDTO> getByUserId(@PathVariable Long id) throws HttpClientErrorException{
+		var project = projectService.getAllUserById(id);
 		return project;
 	}
 	

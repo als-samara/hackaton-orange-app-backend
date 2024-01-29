@@ -1,10 +1,13 @@
 package com.orange.orangeportfolio.dto;
 
+import java.util.List;
+
 import lombok.experimental.FieldNameConstants;
 
 @FieldNameConstants
-public record UserDTO(
+public record UserProjectDTO(
 		Long id,
 		String name,
 		String email,
-		String photo) {}
+		String photo,
+		List<ProjectDTO> projects) {}

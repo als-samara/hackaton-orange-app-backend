@@ -10,4 +10,5 @@ public record ProjectCreateDTO(
 		String description,
 		String photo,
 		String link,
-		List<String> tags) {}
+		List<String> tags,
+		Long userId) {}

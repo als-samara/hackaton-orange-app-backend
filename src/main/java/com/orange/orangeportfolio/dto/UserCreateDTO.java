@@ -6,4 +6,5 @@ import lombok.experimental.FieldNameConstants;
 public record UserCreateDTO(
 		String name,
 		String email,
-		String password) {}
+		String password,
+		String photo) {}

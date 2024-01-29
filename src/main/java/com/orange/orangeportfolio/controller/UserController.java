@@ -14,10 +14,10 @@ import org.springframework.web.client.HttpClientErrorException;
 import com.orange.orangeportfolio.dto.UserCreateDTO;
 import com.orange.orangeportfolio.dto.UserDTO;
 import com.orange.orangeportfolio.dto.UserLoginDTO;
+import com.orange.orangeportfolio.dto.UserProjectDTO;
 import com.orange.orangeportfolio.dto.UserTokenDTO;
 import com.orange.orangeportfolio.dto.UserUpdateDTO;
 import com.orange.orangeportfolio.dto.UserUpdatePasswordDTO;
-import com.orange.orangeportfolio.repository.UserRepository;
 import com.orange.orangeportfolio.service.UserService;
 
 @RestController
@@ -27,12 +27,15 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
-	@Autowired
-	private UserRepository userRepository;
-	
 	@GetMapping("/{id}")
 	public UserDTO getById(@PathVariable Long id) throws HttpClientErrorException {
 		var user = userService.getById(id);
+		return user;
+	}
+	
+	@GetMapping("/{id}/projects")
+	public UserProjectDTO getByIdWithProjects(@PathVariable Long id) throws HttpClientErrorException {
+		var user = userService.getByIdWithProjects(id);
 		return user;
 	}
 	
