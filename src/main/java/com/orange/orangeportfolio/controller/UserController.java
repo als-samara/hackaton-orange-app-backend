@@ -39,7 +39,7 @@ public class UserController {
 		return user;
 	}
 	
-	@PostMapping
+	@PostMapping("/register")
 	public UserDTO post(@RequestBody UserCreateDTO user) throws HttpClientErrorException {
 		var createdUser = userService.create(user);
 		return createdUser;
