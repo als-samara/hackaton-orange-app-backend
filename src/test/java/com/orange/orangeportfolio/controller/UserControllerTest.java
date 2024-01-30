@@ -3,6 +3,9 @@ package com.orange.orangeportfolio.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,18 +14,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.orange.orangeportfolio.dto.ProjectCreateDTO;
+import com.orange.orangeportfolio.dto.ProjectDTO;
 import com.orange.orangeportfolio.dto.UserCreateDTO;
 import com.orange.orangeportfolio.dto.UserDTO;
+import com.orange.orangeportfolio.dto.UserProjectDTO;
 import com.orange.orangeportfolio.dto.UserTokenDTO;
 import com.orange.orangeportfolio.dto.UserUpdateDTO;
 import com.orange.orangeportfolio.dto.UserUpdatePasswordDTO;
+import com.orange.orangeportfolio.model.User;
 import com.orange.orangeportfolio.model.UserLogin;
 import com.orange.orangeportfolio.repository.UserRepository;
+import com.orange.orangeportfolio.service.ProjectService;
 import com.orange.orangeportfolio.service.UserService;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -33,6 +42,9 @@ public class UserControllerTest {
 	
 	@Autowired
 	UserService userService;
+	
+	@Autowired
+	ProjectService projectService;
 	
 	@Autowired
 	UserRepository userRepository;
@@ -139,7 +151,6 @@ public class UserControllerTest {
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 	}
 	
-	// TODO: evitar email duplicado
 	@Test
 	@DisplayName("Prevent Duplicate Emails")
 	public void itShouldPreventHavingDuplicateEmails() {
@@ -155,8 +166,32 @@ public class UserControllerTest {
 		assertEquals(HttpStatus.BAD_REQUEST, responseBody.getStatusCode());
 	}
 	
-	// TODO: listar todos (depois do teste, criar o método)
+	@Test
+	@DisplayName("List all Users")
+	public void itShouldReturnAListOfAllUsers() {
+		userService.create(new UserCreateDTO("Test User 1", "user1@test.com", "testuser1", ""));
+		userService.create(new UserCreateDTO("Test User 2", "user2@test.com", "testuser2", ""));
+		
+		ResponseEntity<List<User>> response = testRestTemplate
+				.withBasicAuth("root@root.com", "rootroot")
+				.exchange("/api/users/all", HttpMethod.GET, null, new ParameterizedTypeReference<List<User>>() {});
+		
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+	}
 	
-	// TODO: retorna o user pelo id do projeto
+	// TODO: retorna o user pelo id do projeto - @GetMapping("/{id}/projects")
+	@Test
+	@DisplayName("Return User by ID Project")
+	public void itShouldReturnTheUserByIdProject() {
+		
+		UserDTO userDTO = userService.create(new UserCreateDTO("User Name", "email@email.com", "senha123", ""));
+		projectService.create((new ProjectCreateDTO("Project Title", "description X", "photo", "link", Arrays.asList("tag 1"), userDTO.id())));
+		
+		ResponseEntity<UserProjectDTO> response = testRestTemplate
+				.withBasicAuth("root@root.com", "rootroot")
+				.exchange("/api/users/{id}/projects", HttpMethod.GET, null, UserProjectDTO.class, userDTO.id());
+		
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+	}
 	
 }

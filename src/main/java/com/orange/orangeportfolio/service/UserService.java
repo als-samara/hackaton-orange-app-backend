@@ -1,5 +1,7 @@
 package com.orange.orangeportfolio.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +18,7 @@ import com.orange.orangeportfolio.dto.UserTokenDTO;
 import com.orange.orangeportfolio.dto.UserUpdateDTO;
 import com.orange.orangeportfolio.dto.UserUpdatePasswordDTO;
 import com.orange.orangeportfolio.mapper.UserMapper;
+import com.orange.orangeportfolio.model.User;
 import com.orange.orangeportfolio.repository.UserRepository;
 import com.orange.orangeportfolio.security.JwtService;
 import com.orange.orangeportfolio.service.exception.FailedAuthenticationException;
@@ -59,6 +62,10 @@ public class UserService {
 		UserNotFoundException.ThrowIfIsEmpty(user);
 
 		return userMapper.toDTO(user.get());
+	}
+	
+	public List<User> getAll() throws HttpClientErrorException {
+		return userRepository.findAll();
 	}
 	
 	public UserProjectDTO getByIdWithProjects(Long id) throws HttpClientErrorException {

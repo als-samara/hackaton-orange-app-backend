@@ -1,5 +1,7 @@
 package com.orange.orangeportfolio.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +20,7 @@ import com.orange.orangeportfolio.dto.UserProjectDTO;
 import com.orange.orangeportfolio.dto.UserTokenDTO;
 import com.orange.orangeportfolio.dto.UserUpdateDTO;
 import com.orange.orangeportfolio.dto.UserUpdatePasswordDTO;
+import com.orange.orangeportfolio.model.User;
 import com.orange.orangeportfolio.service.UserService;
 
 @RestController
@@ -37,6 +40,11 @@ public class UserController {
 	public UserProjectDTO getByIdWithProjects(@PathVariable Long id) throws HttpClientErrorException {
 		var user = userService.getByIdWithProjects(id);
 		return user;
+	}
+	
+	@GetMapping("/all")
+	public List<User> getAllUsers() throws HttpClientErrorException {
+		return userService.getAll();
 	}
 	
 	@PostMapping("/register")
