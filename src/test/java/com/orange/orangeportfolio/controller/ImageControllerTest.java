@@ -51,7 +51,10 @@ public class ImageControllerTest {
     @InjectMocks
     private ImageService imageService;
     
-    @Autowired    
+    @Mock
+    private ImageService imageServiceMock;
+    
+    @InjectMocks   
     private ImageController imageController;
     
     @BeforeEach
@@ -77,7 +80,6 @@ public class ImageControllerTest {
     @DisplayName("Prevent duplicated Image")
     void testUploadImageImageAlreadyUploadedException() throws Exception {
         MockMultipartFile imageFile = new MockMultipartFile("image", "test-image.jpg", "image/jpeg", "conteúdo da imagem".getBytes());
-        
         when(imageRepository.findByName(any())).thenReturn(Optional.of(mock(Image.class)));
         
         assertThrows(ImageAlreadyUploadedException.class, () -> imageService.uploadImage(imageFile));
@@ -88,8 +90,8 @@ public class ImageControllerTest {
     @Test
     void testDownloadImageSuccess() throws Exception {
         // Mock do ImageService para retornar dados de imagem
-        byte[] expectedData = "mockedImageData".getBytes();
-        when(imageService.downloadImage(any())).thenReturn(expectedData);
+    	byte[] expectedData = "mockedImageData".getBytes();
+        when(imageServiceMock.downloadImage(any())).thenReturn(expectedData);
 
         // Executar o método do controlador
         ResponseEntity<?> responseEntity = imageController.downloadImage("test-image.jpg");
