@@ -10,9 +10,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
-
-import java.awt.PageAttributes.MediaType;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -37,14 +34,10 @@ import com.orange.orangeportfolio.service.ImageService;
 import com.orange.orangeportfolio.service.UserService;
 import com.orange.orangeportfolio.service.exception.ImageAlreadyUploadedException;
 import com.orange.orangeportfolio.service.exception.ImageNotFoundException;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ImageControllerTest {
-	
-	@Autowired
-	private TestRestTemplate testRestTemplate;
 	
 	@Autowired
 	private UserService userService;
