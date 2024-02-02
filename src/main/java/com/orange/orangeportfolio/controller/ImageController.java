@@ -17,6 +17,7 @@ import com.orange.orangeportfolio.service.ImageService;
 
 @RestController
 @RequestMapping("/image")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ImageController {
 	
 	@Autowired
