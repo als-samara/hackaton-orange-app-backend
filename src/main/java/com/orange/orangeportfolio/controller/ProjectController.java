@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.ResponseEntity.BodyBuilder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,10 +27,9 @@ import com.orange.orangeportfolio.service.ProjectService;
 import com.orange.orangeportfolio.service.exception.ProjectInvalidPropertyException;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/projects")
+@RequestMapping("/projects")
 public class ProjectController {
 	
 	@Autowired
@@ -45,7 +44,7 @@ public class ProjectController {
 	@Autowired
     private ProjectRepository projectRepository;
 	
-	@PostMapping
+	@PostMapping("/create")
 	public ResponseEntity<?> post(@RequestBody Project project) throws HttpClientErrorException{
 		
 		try {
@@ -67,10 +66,15 @@ public class ProjectController {
 		
 	}
 	
-	@GetMapping("/{id}")
+	@GetMapping("/project/{id}")
 	public Optional<Project> getById(@PathVariable Long id) throws HttpClientErrorException{
 		var project = projectRepository.findById(id);
 		return project;
+	}
+	
+	@GetMapping("/all")
+	public List<Project> getAll() throws HttpClientErrorException{
+		return projectRepository.findAll();
 	}
 	
 	@GetMapping("/user/{id}")
@@ -79,13 +83,15 @@ public class ProjectController {
 		return project;
 	}
 	
-	@PutMapping("/{id}")
+	@PreAuthorize("@projectAuthorizationService.canDeleteProject(authentication, #id)")
+	@PutMapping("/update/{id}")
 	public ProjectDTO update(@PathVariable Long id, @RequestBody ProjectUpdateDTO project) throws HttpClientErrorException{
 		var updateProject = projectService.update(id, project);
 		return updateProject;
 	}
 	
-	@DeleteMapping("/{id}")
+	@PreAuthorize("@projectAuthorizationService.canDeleteProject(authentication, #id)")
+	@DeleteMapping("/delete/{id}")
 	public void delete(@PathVariable Long id) throws HttpClientErrorException{
 		projectService.deleteById(id);
 	}

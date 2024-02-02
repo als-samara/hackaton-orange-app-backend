@@ -44,7 +44,7 @@ public class User {
 	private String email;
 	
 	@Column(length=5000)
-	@Size(min = 8, max=16, message = "The title attribute must contain at least 5 characters")
+	@Size(min = 8, message = "The title attribute must contain at least 5 characters")
 	private String password;
 	
 	@JsonIgnoreProperties("user")
