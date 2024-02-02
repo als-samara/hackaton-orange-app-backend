@@ -53,6 +53,8 @@ public class ProjectController {
 	    Optional<User> user = userRepository.findByEmail(userEmail);
 		
         ProjectInvalidPropertyException.ThrowIfIsNullOrEmpty("title", project.getTitle());
+        ProjectInvalidPropertyException.ThrowIfIsNullOrEmpty("description", project.getDescription());
+        ProjectInvalidPropertyException.ThrowIfIsNullOrEmptyList("tags", project.getTags());
 
 	    project.setUser(user.get());
 		Project createdProject = projectRepository.save(project);
