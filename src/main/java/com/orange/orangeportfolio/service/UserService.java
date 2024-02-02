@@ -22,8 +22,10 @@ import com.orange.orangeportfolio.model.User;
 import com.orange.orangeportfolio.repository.UserRepository;
 import com.orange.orangeportfolio.security.JwtService;
 import com.orange.orangeportfolio.service.exception.FailedAuthenticationException;
+import com.orange.orangeportfolio.service.exception.UserInvalidEmailFormatException;
 import com.orange.orangeportfolio.service.exception.UserInvalidPropertyException;
 import com.orange.orangeportfolio.service.exception.UserNotFoundException;
+import com.orange.orangeportfolio.service.exception.UserPasswordInvalidException;
 import com.orange.orangeportfolio.service.exception.UserWithSameEmailAlreadyCreatedException;
 
 @Service
@@ -44,7 +46,9 @@ public class UserService {
 
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.name, user.name());
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.email, user.email());
+		UserInvalidEmailFormatException.throwIfInvalidEmail(user.email());
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.password, user.password());
+		UserPasswordInvalidException.ThrowIfInvalidPassword(user.password());
 
 		ValidateEmailDuplication(user.email());
 
