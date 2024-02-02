@@ -9,7 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.ResponseEntity.BodyBuilder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +35,6 @@ import com.orange.orangeportfolio.service.ProjectService;
 import com.orange.orangeportfolio.service.exception.ProjectInvalidPropertyException;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -49,10 +50,26 @@ public class ProjectController {
     private ProjectRepository projectRepository;
 	
 	@PostMapping("/create")
-    public ResponseEntity<?> createProject(@RequestBody ProjectCreateDTO project, HttpServletRequest request) {
-        String userEmail = (String) request.getAttribute("userEmail");
-        return projectService.createProject(project, userEmail);
-    }
+	public ResponseEntity<?> post(@RequestBody Project project) throws HttpClientErrorException{
+		
+		try {
+	    String userEmail = (String) request.getAttribute("userEmail");
+	    Optional<User> user = userRepository.findByEmail(userEmail);
+		
+        ProjectInvalidPropertyException.ThrowIfIsNullOrEmpty("title", project.getTitle());
+        ProjectInvalidPropertyException.ThrowIfIsNullOrEmpty("description", project.getDescription());
+        ProjectInvalidPropertyException.ThrowIfIsNullOrEmptyList("tags", project.getTags());
+
+	    project.setUser(user.get());
+		Project createdProject = projectRepository.save(project);
+		
+		return ResponseEntity.status(HttpStatus.CREATED).body("Projeto " + createdProject.getTitle() + " criado com sucesso!");
+	    
+		} catch (ProjectInvalidPropertyException e) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+	    }
+		
+	}
 	
 	@GetMapping("/project/{id}")
 	public Optional<Project> getById(@PathVariable Long id) throws HttpClientErrorException{
@@ -72,7 +89,7 @@ public class ProjectController {
 	}
 	
 	@PreAuthorize("@projectAuthorizationService.canUpdateProject(authentication, #id)")
-	@PutMapping("/update/{id}")
+	@PutMapping("/update/update/{id}")
 	public ProjectDTO update(@PathVariable Long id, @RequestBody ProjectUpdateDTO project) throws HttpClientErrorException{
 		var updateProject = projectService.update(id, project);
 		return updateProject;
