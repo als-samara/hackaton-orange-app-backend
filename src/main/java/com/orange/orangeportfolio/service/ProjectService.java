@@ -34,26 +34,7 @@ public class ProjectService {
 	@Autowired
 	UserRepository userRepository;
 	
-	@Autowired
-    private HttpServletRequest request;
-	
 	@Autowired JwtService jwtService;
-	
-	public Project create(Project project) throws HttpClientErrorException{
-		
-		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.title, project.getTitle());
-		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.description, project.getDescription());
-		
-	    String userEmail = (String) request.getAttribute("userEmail");
-	    Optional<User> user = userRepository.findByEmail(userEmail);
-		
-		Project createdProject = projectRepository.save(project);
-		
-		//if(user.isPresent())
-			project.setUser(user.get());
-		
-		return createdProject;
-	}
 
 	public ProjectDTO update(Long id, ProjectUpdateDTO project) throws HttpClientErrorException{
 		
