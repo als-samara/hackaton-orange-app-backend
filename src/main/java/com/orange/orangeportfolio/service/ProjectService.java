@@ -16,13 +16,19 @@ import com.orange.orangeportfolio.dto.ProjectUpdateDTO;
 import com.orange.orangeportfolio.mapper.ProjectMapper;
 import com.orange.orangeportfolio.model.Project;
 import com.orange.orangeportfolio.model.User;
+import com.orange.orangeportfolio.model.Project;
+import com.orange.orangeportfolio.model.User;
 import com.orange.orangeportfolio.repository.ProjectRepository;
+import com.orange.orangeportfolio.repository.UserRepository;
+import com.orange.orangeportfolio.security.JwtService;
 import com.orange.orangeportfolio.repository.UserRepository;
 import com.orange.orangeportfolio.security.JwtService;
 import com.orange.orangeportfolio.service.exception.ProjectInvalidPropertyException;
 import com.orange.orangeportfolio.service.exception.ProjectNotFoundException;
 import com.orange.orangeportfolio.service.exception.ProjectPropertyTooLongException;
 import com.orange.orangeportfolio.service.exception.UserInvalidPropertyException;
+
+import jakarta.servlet.http.HttpServletRequest;
 import com.orange.orangeportfolio.service.exception.UserNotFoundException;
 
 @Service
