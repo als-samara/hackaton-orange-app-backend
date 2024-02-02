@@ -1,6 +1,7 @@
 package com.orange.orangeportfolio.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +12,15 @@ import com.orange.orangeportfolio.dto.ProjectCreateDTO;
 import com.orange.orangeportfolio.dto.ProjectDTO;
 import com.orange.orangeportfolio.dto.ProjectUpdateDTO;
 import com.orange.orangeportfolio.mapper.ProjectMapper;
+import com.orange.orangeportfolio.model.Project;
+import com.orange.orangeportfolio.model.User;
 import com.orange.orangeportfolio.repository.ProjectRepository;
+import com.orange.orangeportfolio.repository.UserRepository;
+import com.orange.orangeportfolio.security.JwtService;
 import com.orange.orangeportfolio.service.exception.ProjectNotFoundException;
 import com.orange.orangeportfolio.service.exception.UserInvalidPropertyException;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class ProjectService {
@@ -24,19 +31,30 @@ public class ProjectService {
 	@Autowired
 	private ProjectMapper projectMapper;
 	
-	public ProjectDTO create(ProjectCreateDTO project) throws HttpClientErrorException{
+	@Autowired
+	UserRepository userRepository;
+	
+	@Autowired
+    private HttpServletRequest request;
+	
+	@Autowired JwtService jwtService;
+	
+	public Project create(Project project) throws HttpClientErrorException{
 		
-		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.title, project.title());
-		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.description, project.description());
+		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.title, project.getTitle());
+		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.description, project.getDescription());
 		
-		var projectEntity = projectMapper.toProject(project);
-		projectEntity = projectRepository.save(projectEntity);
+	    String userEmail = (String) request.getAttribute("userEmail");
+	    Optional<User> user = userRepository.findByEmail(userEmail);
 		
-		var createdProject = projectMapper.toDTO(projectEntity);
+		Project createdProject = projectRepository.save(project);
+		
+		//if(user.isPresent())
+			project.setUser(user.get());
 		
 		return createdProject;
 	}
-	
+
 	public ProjectDTO update(Long id, ProjectUpdateDTO project) throws HttpClientErrorException{
 		
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.title, project.title());

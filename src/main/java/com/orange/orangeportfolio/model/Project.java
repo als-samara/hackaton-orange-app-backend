@@ -2,7 +2,7 @@ package com.orange.orangeportfolio.model;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -45,6 +45,8 @@ public class Project {
 	@Size(message="Photo path cannot be longer than 5000 characters")
 	private String photo;
 	
+	@Column(length=5000)
+	@Size(message="Photo path cannot be longer than 5000 characters")
 	private String link;
 	
 	@ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
@@ -53,8 +55,8 @@ public class Project {
 	private List<String> tags;
 	
 	@ManyToOne
-    @JoinColumn(name="user_id")
-    @JsonIgnore
+    //@JoinColumn(name="user_id")
+    @JsonIgnoreProperties("projects")
 	private User user;
 	
 	
