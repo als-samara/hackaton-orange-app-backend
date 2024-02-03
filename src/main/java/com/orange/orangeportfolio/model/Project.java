@@ -35,10 +35,12 @@ public class Project {
 	private Long id;
 	
 	@NotBlank(message="Title cannot be blank")
+	@Column(length=80)
+	@Size(message="title cannot be longer than 80 characters")
 	private String title;
 	
-	@Column(length=600)
-	@Size(message="Description cannot be longer than 600 characters")
+	@Column(length=650)
+	@Size(message="Description cannot be longer than 650 characters")
 	private String description;
 	
 	@Column(length=5000)
@@ -55,7 +57,6 @@ public class Project {
 	private List<String> tags;
 	
 	@ManyToOne
-    //@JoinColumn(name="user_id")
     @JsonIgnoreProperties("projects")
 	private User user;
 	

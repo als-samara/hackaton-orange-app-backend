@@ -25,6 +25,7 @@ import com.orange.orangeportfolio.repository.ProjectRepository;
 import com.orange.orangeportfolio.repository.UserRepository;
 import com.orange.orangeportfolio.service.ProjectService;
 import com.orange.orangeportfolio.service.exception.ProjectInvalidPropertyException;
+import com.orange.orangeportfolio.service.exception.ProjectPropertyTooLongException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -54,13 +55,15 @@ public class ProjectController {
         ProjectInvalidPropertyException.ThrowIfIsNullOrEmpty("title", project.getTitle());
         ProjectInvalidPropertyException.ThrowIfIsNullOrEmpty("description", project.getDescription());
         ProjectInvalidPropertyException.ThrowIfIsNullOrEmptyList("tags", project.getTags());
-
+        ProjectPropertyTooLongException.ThrowIfDataIsTooLong("title", project.getTitle(), 80);
+        ProjectPropertyTooLongException.ThrowIfDataIsTooLong("description", project.getDescription(), 650);
+        
 	    project.setUser(user.get());
 		Project createdProject = projectRepository.save(project);
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body("Projeto " + createdProject.getTitle() + " criado com sucesso!");
 	    
-		} catch (ProjectInvalidPropertyException e) {
+		} catch (ProjectInvalidPropertyException | ProjectPropertyTooLongException e) {
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 	    }
 		
@@ -90,7 +93,7 @@ public class ProjectController {
 		return updateProject;
 	}
 	
-	@PreAuthorize("@projectAuthorizationService.canDeleteProject(authentication, #id)")
+	@PreAuthorize("@projectAuthorizationService.canUpdateProject(authentication, #id)")
 	@DeleteMapping("/delete/{id}")
 	public void delete(@PathVariable Long id) throws HttpClientErrorException{
 		projectService.deleteById(id);
