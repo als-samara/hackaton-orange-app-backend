@@ -37,37 +37,13 @@ public class ProjectController {
 	private ProjectService projectService;
 	
 	@Autowired
-    private HttpServletRequest request;
-	
-	@Autowired
-    private UserRepository userRepository;
-	
-	@Autowired
     private ProjectRepository projectRepository;
 	
 	@PostMapping("/create")
-	public ResponseEntity<?> post(@RequestBody Project project) throws HttpClientErrorException{
-		
-		try {
-	    String userEmail = (String) request.getAttribute("userEmail");
-	    Optional<User> user = userRepository.findByEmail(userEmail);
-		
-        ProjectInvalidPropertyException.ThrowIfIsNullOrEmpty("title", project.getTitle());
-        ProjectInvalidPropertyException.ThrowIfIsNullOrEmpty("description", project.getDescription());
-        ProjectInvalidPropertyException.ThrowIfIsNullOrEmptyList("tags", project.getTags());
-        ProjectPropertyTooLongException.ThrowIfDataIsTooLong("title", project.getTitle(), 80);
-        ProjectPropertyTooLongException.ThrowIfDataIsTooLong("description", project.getDescription(), 650);
-        
-	    project.setUser(user.get());
-		Project createdProject = projectRepository.save(project);
-		
-		return ResponseEntity.status(HttpStatus.CREATED).body("Projeto " + createdProject.getTitle() + " criado com sucesso!");
-	    
-		} catch (ProjectInvalidPropertyException | ProjectPropertyTooLongException e) {
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-	    }
-		
-	}
+    public ResponseEntity<?> createProject(@RequestBody Project project, HttpServletRequest request) {
+        String userEmail = (String) request.getAttribute("userEmail");
+        return projectService.createProject(project, userEmail);
+    }
 	
 	@GetMapping("/project/{id}")
 	public Optional<Project> getById(@PathVariable Long id) throws HttpClientErrorException{
