@@ -1,6 +1,7 @@
 package com.orange.orangeportfolio.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,7 +27,10 @@ import com.orange.orangeportfolio.service.exception.UserInvalidEmailFormatExcept
 import com.orange.orangeportfolio.service.exception.UserInvalidPropertyException;
 import com.orange.orangeportfolio.service.exception.UserNotFoundException;
 import com.orange.orangeportfolio.service.exception.UserPasswordInvalidException;
+import com.orange.orangeportfolio.service.exception.UserUnauthorizedException;
 import com.orange.orangeportfolio.service.exception.UserWithSameEmailAlreadyCreatedException;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class UserService {
@@ -41,6 +45,9 @@ public class UserService {
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
+	
+	@Autowired
+	HttpServletRequest request;
 
 	public UserDTO create(UserCreateDTO user) throws HttpClientErrorException {
 
@@ -85,8 +92,20 @@ public class UserService {
 		var user = userRepository.findById(id);
 
 		UserNotFoundException.ThrowIfIsEmpty(user);
-
+		
 		userRepository.deleteById(id);
+	}
+	
+	public boolean canDeleteAndUpdateUser(Authentication authentication, Long userId) {
+		
+		String userEmail = (String) request.getAttribute("userEmail");
+	    Optional<User> user = userRepository.findByEmail(userEmail);
+	    user = userRepository.findById(userId);
+		
+        if(userId == user.get().getId())
+        	return true;
+        else
+        	 throw new UserUnauthorizedException();
 	}
 
 	public UserDTO update(Long id, UserUpdateDTO user) throws HttpClientErrorException {

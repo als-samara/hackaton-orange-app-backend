@@ -3,6 +3,7 @@ package com.orange.orangeportfolio.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,12 +62,14 @@ public class UserController {
 		return token;
 	}
 	
+	@PreAuthorize("userService.canDeleteAndUpdateUser(authentication, #id)")
 	@PutMapping("/{id}")
 	public UserDTO put(@PathVariable Long id, @RequestBody UserUpdateDTO user) throws HttpClientErrorException {
 		var updateUser = userService.update(id, user);
 		return updateUser;
 	}
 	
+	@PreAuthorize("userService.canDeleteAndUpdateUser(authentication, #id)")
 	@DeleteMapping("/{id}")
 	public void delete(@PathVariable Long id) throws HttpClientErrorException {
 		userService.deleteById(id);
