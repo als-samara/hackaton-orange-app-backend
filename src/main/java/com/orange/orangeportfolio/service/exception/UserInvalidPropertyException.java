@@ -21,4 +21,10 @@ public class UserInvalidPropertyException extends HttpClientErrorException{
 		}
 	}
 	
+	public static void ThrowIfIsValidateBlanckSpace(String propertyName, String propertyValue) {
+		if(propertyValue == " ") {
+			throw new UserInvalidPropertyException(propertyName);
+		}
+	}
+	
 }

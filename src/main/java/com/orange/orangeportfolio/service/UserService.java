@@ -45,6 +45,7 @@ public class UserService {
 	public UserDTO create(UserCreateDTO user) throws HttpClientErrorException {
 
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.name, user.name());
+		UserInvalidPropertyException.ThrowIfIsValidateBlanckSpace(UserCreateDTO.Fields.name, user.name());
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.email, user.email());
 		UserInvalidEmailFormatException.throwIfInvalidEmail(user.email());
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.password, user.password());
