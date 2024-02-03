@@ -23,7 +23,6 @@ public class UserMapper {
 	
 	public UserDTO toDTO(User user) {
 		var userDTO = new UserDTO(
-				user.getId(),
 				user.getName(), 
 				user.getEmail(),
 				user.getPhoto());
@@ -39,7 +38,6 @@ public class UserMapper {
 				.name(userCreateDTO.name())
 				.email(userCreateDTO.email())
 				.password(passwordHash)
-				.photo(userCreateDTO.photo())
 				.build();
 		
 		return user;

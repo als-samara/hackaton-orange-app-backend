@@ -1,9 +1,12 @@
 package com.orange.orangeportfolio.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -11,9 +14,16 @@ import com.orange.orangeportfolio.dto.ProjectCreateDTO;
 import com.orange.orangeportfolio.dto.ProjectDTO;
 import com.orange.orangeportfolio.dto.ProjectUpdateDTO;
 import com.orange.orangeportfolio.mapper.ProjectMapper;
+import com.orange.orangeportfolio.model.Project;
+import com.orange.orangeportfolio.model.User;
 import com.orange.orangeportfolio.repository.ProjectRepository;
+import com.orange.orangeportfolio.repository.UserRepository;
+import com.orange.orangeportfolio.security.JwtService;
+import com.orange.orangeportfolio.service.exception.ProjectInvalidPropertyException;
 import com.orange.orangeportfolio.service.exception.ProjectNotFoundException;
+import com.orange.orangeportfolio.service.exception.ProjectPropertyTooLongException;
 import com.orange.orangeportfolio.service.exception.UserInvalidPropertyException;
+import com.orange.orangeportfolio.service.exception.UserNotFoundException;
 
 @Service
 public class ProjectService {
@@ -24,19 +34,36 @@ public class ProjectService {
 	@Autowired
 	private ProjectMapper projectMapper;
 	
-	public ProjectDTO create(ProjectCreateDTO project) throws HttpClientErrorException{
-		
-		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.title, project.title());
-		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.description, project.description());
-		
-		var projectEntity = projectMapper.toProject(project);
-		projectEntity = projectRepository.save(projectEntity);
-		
-		var createdProject = projectMapper.toDTO(projectEntity);
-		
-		return createdProject;
-	}
+	@Autowired
+	UserRepository userRepository;
 	
+	@Autowired JwtService jwtService;
+	
+	public ResponseEntity<?> createProject(Project project, String userEmail) {
+        try {
+            Optional<User> user = userRepository.findByEmail(userEmail);
+
+            validateProjectProperties(project);
+
+            project.setUser(user.orElseThrow(() -> new UserNotFoundException()));
+
+            Project createdProject = projectRepository.save(project);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body("Projeto " + createdProject.getTitle() + " criado com sucesso!");
+
+        } catch (ProjectInvalidPropertyException | ProjectPropertyTooLongException | UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    private void validateProjectProperties(Project project) {
+        ProjectInvalidPropertyException.ThrowIfIsNullOrEmpty("title", project.getTitle());
+        ProjectInvalidPropertyException.ThrowIfIsNullOrEmpty("description", project.getDescription());
+        ProjectInvalidPropertyException.ThrowIfIsNullOrEmptyList("tags", project.getTags());
+        ProjectPropertyTooLongException.ThrowIfDataIsTooLong("title", project.getTitle(), 80);
+        ProjectPropertyTooLongException.ThrowIfDataIsTooLong("description", project.getDescription(), 650);
+    }
+
 	public ProjectDTO update(Long id, ProjectUpdateDTO project) throws HttpClientErrorException{
 		
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.title, project.title());

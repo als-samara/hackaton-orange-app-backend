@@ -2,7 +2,7 @@ package com.orange.orangeportfolio.model;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -35,16 +35,20 @@ public class Project {
 	private Long id;
 	
 	@NotBlank(message="Title cannot be blank")
+	@Column(length=80)
+	@Size(message="title cannot be longer than 80 characters")
 	private String title;
 	
-	@Column(length=600)
-	@Size(message="Description cannot be longer than 600 characters")
+	@Column(length=650)
+	@Size(message="Description cannot be longer than 650 characters")
 	private String description;
 	
 	@Column(length=5000)
 	@Size(message="Photo path cannot be longer than 5000 characters")
 	private String photo;
 	
+	@Column(length=5000)
+	@Size(message="Photo path cannot be longer than 5000 characters")
 	private String link;
 	
 	@ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
@@ -53,8 +57,7 @@ public class Project {
 	private List<String> tags;
 	
 	@ManyToOne
-    @JoinColumn(name="user_id")
-    @JsonIgnore
+    @JsonIgnoreProperties("projects")
 	private User user;
 	
 	

@@ -2,8 +2,11 @@ package com.orange.orangeportfolio.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -28,18 +31,26 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Getter private Long id;
+	
 	@NotBlank(message = "Name cannot be blank")
 	private String name;
+	
 	@Schema(example = "email@email.com.br")
 	@Email
 	private String email;
-	@Size(min = 8, message = "The title attribute must contain at least 5 characters")
+	
+	@Column(length=5000)
+	@Size(min = 8, message = "The password must contain at least 8")
 	private String password;
+	
+	@JsonIgnoreProperties("user")
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
 	private List<Project> projects;
+	
 	private String photo;
 	
 }

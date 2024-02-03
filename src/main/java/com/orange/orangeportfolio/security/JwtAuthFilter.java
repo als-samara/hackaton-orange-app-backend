@@ -29,6 +29,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
+    
+    //private String email;  // Adicionando uma variável de classe para armazenar o e-mail extraído
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -40,6 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 token = authHeader.substring(7);
                 email = jwtService.extractUsername(token);
+                setAuthentication(email, token, request); // fiz isso
             }
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -60,4 +63,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
     }
+    
+    private void setAuthentication(String email, String token, HttpServletRequest request) {
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+            if (jwtService.validateToken(token, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+                request.setAttribute("userEmail", email);  // Adiciona o e-mail aos atributos da requisição
+            }
+        }
+    }
+    
 }

@@ -141,7 +141,7 @@ public class UserControllerTest {
 	@Test
 	@DisplayName("Delete User searching by its Id")
 	public void itShouldDeleteTheUser() {
-		UserCreateDTO userCreateDTO = new UserCreateDTO("Test User", "user@test.com", "testuser", "");
+		UserCreateDTO userCreateDTO = new UserCreateDTO("Test User", "user@test.com", "testuser");
 		UserDTO userDTO = userService.create(userCreateDTO);
 		
 		ResponseEntity<UserDTO> response = testRestTemplate
@@ -154,10 +154,10 @@ public class UserControllerTest {
 	@Test
 	@DisplayName("Prevent Duplicate Emails")
 	public void itShouldPreventHavingDuplicateEmails() {
-		userService.create(new UserCreateDTO("Test User", "user@test.com", "testuser", ""));
+		userService.create(new UserCreateDTO("Test User", "user@test.com", "testuser"));
 		
 		HttpEntity<UserCreateDTO> requestBody = new HttpEntity<UserCreateDTO>(
-				new UserCreateDTO("Test User", "user@test.com", "testuser", ""));
+				new UserCreateDTO("Test User", "user@test.com", "testuser"));
 		
 		ResponseEntity<UserDTO> responseBody = testRestTemplate
 				.withBasicAuth("root@root.com", "rootroot")
@@ -169,8 +169,8 @@ public class UserControllerTest {
 	@Test
 	@DisplayName("List all Users")
 	public void itShouldReturnAListOfAllUsers() {
-		userService.create(new UserCreateDTO("Test User 1", "user1@test.com", "testuser1", ""));
-		userService.create(new UserCreateDTO("Test User 2", "user2@test.com", "testuser2", ""));
+		userService.create(new UserCreateDTO("Test User 1", "user1@test.com", "testuser1"));
+		userService.create(new UserCreateDTO("Test User 2", "user2@test.com", "testuser2"));
 		
 		ResponseEntity<List<User>> response = testRestTemplate
 				.withBasicAuth("root@root.com", "rootroot")
@@ -184,7 +184,7 @@ public class UserControllerTest {
 	@DisplayName("Return User by ID Project")
 	public void itShouldReturnTheUserByIdProject() {
 		
-		UserDTO userDTO = userService.create(new UserCreateDTO("User Name", "email@email.com", "senha123", ""));
+		UserDTO userDTO = userService.create(new UserCreateDTO("User Name", "email@email.com", "senha123"));
 		projectService.create((new ProjectCreateDTO("Project Title", "description X", "photo", "link", Arrays.asList("tag 1"), userDTO.id())));
 		
 		ResponseEntity<UserProjectDTO> response = testRestTemplate

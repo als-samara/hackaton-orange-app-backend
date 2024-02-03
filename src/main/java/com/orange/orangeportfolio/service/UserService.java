@@ -22,9 +22,14 @@ import com.orange.orangeportfolio.model.User;
 import com.orange.orangeportfolio.repository.UserRepository;
 import com.orange.orangeportfolio.security.JwtService;
 import com.orange.orangeportfolio.service.exception.FailedAuthenticationException;
+import com.orange.orangeportfolio.service.exception.UserInvalidEmailFormatException;
 import com.orange.orangeportfolio.service.exception.UserInvalidPropertyException;
+import com.orange.orangeportfolio.service.exception.UserInvalidPropertySizeException;
 import com.orange.orangeportfolio.service.exception.UserNotFoundException;
+import com.orange.orangeportfolio.service.exception.UserUnauthorizedException;
 import com.orange.orangeportfolio.service.exception.UserWithSameEmailAlreadyCreatedException;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class UserService {
@@ -39,12 +44,18 @@ public class UserService {
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
+	
+	@Autowired
+	HttpServletRequest request;
 
 	public UserDTO create(UserCreateDTO user) throws HttpClientErrorException {
 
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.name, user.name());
+		UserInvalidPropertySizeException.ThrowIfInvalidName(user.name());
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.email, user.email());
+		UserInvalidEmailFormatException.throwIfInvalidEmail(user.email());
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.password, user.password());
+		UserInvalidPropertySizeException.ThrowIfInvalidPassword(user.password());
 
 		ValidateEmailDuplication(user.email());
 
@@ -77,10 +88,12 @@ public class UserService {
 	}
 
 	public void deleteById(Long id) throws HttpClientErrorException {
-		var user = userRepository.findById(id);
+		var result = userRepository.findById(id);
 
-		UserNotFoundException.ThrowIfIsEmpty(user);
-
+		UserNotFoundException.ThrowIfIsEmpty(result);
+		
+		ValidateUser(result.get());
+		
 		userRepository.deleteById(id);
 	}
 
@@ -94,6 +107,8 @@ public class UserService {
 		var result = userRepository.findById(id);
 
 		UserNotFoundException.ThrowIfIsEmpty(result);
+		
+		ValidateUser(result.get());
 
 		var userEntity = result.get();
 		userEntity = userMapper.toUser(user, userEntity);
@@ -108,6 +123,8 @@ public class UserService {
 		var user = userRepository.findById(id);
 		
 		UserNotFoundException.ThrowIfIsEmpty(user);
+		
+		ValidateUser(user.get());
 		
 		var updatedPasswordUser = userMapper.toUser(password, user.get());
 		
@@ -131,7 +148,7 @@ public class UserService {
 		
 		return userToken;
 	}
-
+	
 	private void ValidateEmailDuplication(String email, Long id) {
 		var result = userRepository.findByEmail(email);
 
@@ -152,6 +169,18 @@ public class UserService {
 
 		if (result.isPresent()) {
 			throw new UserWithSameEmailAlreadyCreatedException();
+		}
+	}
+	
+	private void ValidateUser(User user) {
+		var userEmail = request
+				.getAttribute("userEmail")
+				.toString();
+		
+		var isSameUser = user.getEmail().equals(userEmail);
+		
+		if(!isSameUser) {
+			throw new UserUnauthorizedException();
 		}
 	}
 
