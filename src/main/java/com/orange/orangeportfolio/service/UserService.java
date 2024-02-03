@@ -1,7 +1,6 @@
 package com.orange.orangeportfolio.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,8 +24,8 @@ import com.orange.orangeportfolio.security.JwtService;
 import com.orange.orangeportfolio.service.exception.FailedAuthenticationException;
 import com.orange.orangeportfolio.service.exception.UserInvalidEmailFormatException;
 import com.orange.orangeportfolio.service.exception.UserInvalidPropertyException;
+import com.orange.orangeportfolio.service.exception.UserInvalidPropertySizeException;
 import com.orange.orangeportfolio.service.exception.UserNotFoundException;
-import com.orange.orangeportfolio.service.exception.UserPasswordInvalidException;
 import com.orange.orangeportfolio.service.exception.UserUnauthorizedException;
 import com.orange.orangeportfolio.service.exception.UserWithSameEmailAlreadyCreatedException;
 
@@ -52,11 +51,11 @@ public class UserService {
 	public UserDTO create(UserCreateDTO user) throws HttpClientErrorException {
 
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.name, user.name());
-		UserInvalidPropertyException.ThrowIfIsValidateBlanckSpace(UserCreateDTO.Fields.name, user.name());
+		UserInvalidPropertySizeException.ThrowIfInvalidName(user.name());
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.email, user.email());
 		UserInvalidEmailFormatException.throwIfInvalidEmail(user.email());
 		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(UserCreateDTO.Fields.password, user.password());
-		UserPasswordInvalidException.ThrowIfInvalidPassword(user.password());
+		UserInvalidPropertySizeException.ThrowIfInvalidPassword(user.password());
 
 		ValidateEmailDuplication(user.email());
 
@@ -89,23 +88,13 @@ public class UserService {
 	}
 
 	public void deleteById(Long id) throws HttpClientErrorException {
-		var user = userRepository.findById(id);
+		var result = userRepository.findById(id);
 
-		UserNotFoundException.ThrowIfIsEmpty(user);
+		UserNotFoundException.ThrowIfIsEmpty(result);
+		
+		ValidateUser(result.get());
 		
 		userRepository.deleteById(id);
-	}
-	
-	public boolean canDeleteAndUpdateUser(Authentication authentication, Long userId) {
-		
-		String userEmail = (String) request.getAttribute("userEmail");
-	    Optional<User> user = userRepository.findByEmail(userEmail);
-	    user = userRepository.findById(userId);
-		
-        if(userId == user.get().getId())
-        	return true;
-        else
-        	 throw new UserUnauthorizedException();
 	}
 
 	public UserDTO update(Long id, UserUpdateDTO user) throws HttpClientErrorException {
@@ -118,6 +107,8 @@ public class UserService {
 		var result = userRepository.findById(id);
 
 		UserNotFoundException.ThrowIfIsEmpty(result);
+		
+		ValidateUser(result.get());
 
 		var userEntity = result.get();
 		userEntity = userMapper.toUser(user, userEntity);
@@ -132,6 +123,8 @@ public class UserService {
 		var user = userRepository.findById(id);
 		
 		UserNotFoundException.ThrowIfIsEmpty(user);
+		
+		ValidateUser(user.get());
 		
 		var updatedPasswordUser = userMapper.toUser(password, user.get());
 		
@@ -155,7 +148,7 @@ public class UserService {
 		
 		return userToken;
 	}
-
+	
 	private void ValidateEmailDuplication(String email, Long id) {
 		var result = userRepository.findByEmail(email);
 
@@ -176,6 +169,18 @@ public class UserService {
 
 		if (result.isPresent()) {
 			throw new UserWithSameEmailAlreadyCreatedException();
+		}
+	}
+	
+	private void ValidateUser(User user) {
+		var userEmail = request
+				.getAttribute("userEmail")
+				.toString();
+		
+		var isSameUser = user.getEmail().equals(userEmail);
+		
+		if(!isSameUser) {
+			throw new UserUnauthorizedException();
 		}
 	}
 

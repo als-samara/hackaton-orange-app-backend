@@ -62,14 +62,12 @@ public class UserController {
 		return token;
 	}
 	
-	@PreAuthorize("userService.canDeleteAndUpdateUser(authentication, #id)")
 	@PutMapping("/{id}")
 	public UserDTO put(@PathVariable Long id, @RequestBody UserUpdateDTO user) throws HttpClientErrorException {
 		var updateUser = userService.update(id, user);
 		return updateUser;
 	}
 	
-	@PreAuthorize("userService.canDeleteAndUpdateUser(authentication, #id)")
 	@DeleteMapping("/{id}")
 	public void delete(@PathVariable Long id) throws HttpClientErrorException {
 		userService.deleteById(id);
