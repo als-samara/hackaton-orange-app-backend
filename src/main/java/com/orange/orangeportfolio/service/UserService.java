@@ -19,6 +19,7 @@ import com.orange.orangeportfolio.dto.UserUpdateDTO;
 import com.orange.orangeportfolio.dto.UserUpdatePasswordDTO;
 import com.orange.orangeportfolio.mapper.UserMapper;
 import com.orange.orangeportfolio.model.User;
+import com.orange.orangeportfolio.repository.ProjectRepository;
 import com.orange.orangeportfolio.repository.UserRepository;
 import com.orange.orangeportfolio.security.JwtService;
 import com.orange.orangeportfolio.service.exception.FailedAuthenticationException;
@@ -35,6 +36,9 @@ import jakarta.servlet.http.HttpServletRequest;
 public class UserService {
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private ProjectRepository projectRepository;
 
 	@Autowired
 	private UserMapper userMapper;
@@ -75,6 +79,14 @@ public class UserService {
 		return userMapper.toDTO(user.get());
 	}
 	
+	public UserDTO getByEmail(String email) throws HttpClientErrorException {
+		var user = userRepository.findByEmail(email);
+
+		UserNotFoundException.ThrowIfIsEmpty(user);
+
+		return userMapper.toDTO(user.get());
+	}
+	
 	public List<User> getAll() throws HttpClientErrorException {
 		return userRepository.findAll();
 	}
@@ -85,6 +97,17 @@ public class UserService {
 		UserNotFoundException.ThrowIfIsEmpty(user);
 
 		return userMapper.toUserProjectDTO(user.get());
+	
+	}
+	
+	public UserProjectDTO getByEmailWithProjects(String email) throws HttpClientErrorException {
+		var user = userRepository.findByEmail(email);
+
+		UserNotFoundException.ThrowIfIsEmpty(user);
+
+		return getByIdWithProjects(user.get().getId());
+		
+		
 	}
 
 	public void deleteById(Long id) throws HttpClientErrorException {

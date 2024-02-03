@@ -3,7 +3,8 @@ package com.orange.orangeportfolio.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,7 @@ import com.orange.orangeportfolio.dto.UserTokenDTO;
 import com.orange.orangeportfolio.dto.UserUpdateDTO;
 import com.orange.orangeportfolio.dto.UserUpdatePasswordDTO;
 import com.orange.orangeportfolio.model.User;
+import com.orange.orangeportfolio.repository.UserRepository;
 import com.orange.orangeportfolio.service.UserService;
 
 @RestController
@@ -31,6 +33,20 @@ public class UserController {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	UserRepository userRepository;
+	
+	@GetMapping
+    public UserProjectDTO getByEmailWithProjects(@CurrentSecurityContext(expression="authentication.name")String email) throws HttpClientErrorException {
+        var userWithProjects = userService.getByEmailWithProjects(email);
+        return userWithProjects;
+    }
+	
+	@GetMapping("/user/{email}")
+	public UserDTO getByEmail(String email) {
+		return userService.getByEmail(email);
+    }
 	
 	@GetMapping("/{id}")
 	public UserDTO getById(@PathVariable Long id) throws HttpClientErrorException {
