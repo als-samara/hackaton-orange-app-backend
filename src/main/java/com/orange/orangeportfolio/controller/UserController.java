@@ -28,25 +28,10 @@ import com.orange.orangeportfolio.service.UserService;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class UserController {
 	
 	@Autowired
 	private UserService userService;
-	
-	@Autowired
-	UserRepository userRepository;
-	
-	@GetMapping
-    public UserProjectDTO getByEmailWithProjects(@CurrentSecurityContext(expression="authentication.name")String email) throws HttpClientErrorException {
-        var userWithProjects = userService.getByEmailWithProjects(email);
-        return userWithProjects;
-    }
-	
-	@GetMapping("/user/{email}")
-	public UserDTO getByEmail(String email) {
-		return userService.getByEmail(email);
-    }
 	
 	@GetMapping("/{id}")
 	public UserDTO getById(@PathVariable Long id) throws HttpClientErrorException {
