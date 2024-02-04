@@ -4,9 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,17 +21,14 @@ import org.springframework.web.client.HttpClientErrorException;
 import com.orange.orangeportfolio.dto.ProjectDTO;
 import com.orange.orangeportfolio.dto.ProjectUpdateDTO;
 import com.orange.orangeportfolio.model.Project;
-import com.orange.orangeportfolio.model.User;
 import com.orange.orangeportfolio.repository.ProjectRepository;
-import com.orange.orangeportfolio.repository.UserRepository;
 import com.orange.orangeportfolio.service.ProjectService;
-import com.orange.orangeportfolio.service.exception.ProjectInvalidPropertyException;
-import com.orange.orangeportfolio.service.exception.ProjectPropertyTooLongException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/projects")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ProjectController {
 	
 	@Autowired
