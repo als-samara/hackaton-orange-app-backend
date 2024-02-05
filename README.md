@@ -38,5 +38,5 @@ Visualize o Deploy do Back-End pelo link: https://hackaton-orange-app-backend.on
 
 Para dúvidas ou sugestões, entre em contato como time de desenvolvedores: 
 
-[![Linke Tree](https://img.shields.io/badge/LinkTree-Squad%2035-green)]([mailto:samaraalmeida379@gmail.com](https://linktr.ee/squad35.programaformacao.v5))
+[![Linke Tree](https://img.shields.io/badge/LinkTree-Squad%2035-green)](https://linktr.ee/squad35.programaformacao.v5)
 
