@@ -53,4 +53,7 @@ public class User {
 	
 	private String photo;
 	
+	@JsonIgnoreProperties("user")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+	private List<Image> images;
 }
