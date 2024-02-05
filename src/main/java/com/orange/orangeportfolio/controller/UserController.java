@@ -39,6 +39,17 @@ public class UserController {
 		return user;
 	}
 	
+	@GetMapping
+    public UserProjectDTO getByEmailWithProjects(@CurrentSecurityContext(expression="authentication.name")String email) throws HttpClientErrorException {
+        var userWithProjects = userService.getByEmailWithProjects(email);
+        return userWithProjects;
+    }
+	
+	@GetMapping("/user")
+	public UserDTO getByEmail(@CurrentSecurityContext(expression="authentication.name")String email) {
+		return userService.getByEmail(email);
+    }
+	
 	@GetMapping("/{id}/projects")
 	public UserProjectDTO getByIdWithProjects(@PathVariable Long id) throws HttpClientErrorException {
 		var user = userService.getByIdWithProjects(id);
