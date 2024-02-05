@@ -5,5 +5,4 @@ import lombok.experimental.FieldNameConstants;
 @FieldNameConstants
 public record UserDTO(
 		String name,
-		String email,
-		String photo) {}
+		String email) {}
