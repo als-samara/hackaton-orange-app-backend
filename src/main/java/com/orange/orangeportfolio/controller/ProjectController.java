@@ -63,7 +63,7 @@ public class ProjectController {
 	}
 	
 	@PreAuthorize("@projectAuthorizationService.canUpdateProject(authentication, #id)")
-	@PutMapping("/update/update/{id}")
+	@PutMapping("/update/{id}")
 	public ProjectDTO update(@PathVariable Long id, @RequestBody ProjectUpdateDTO project) throws HttpClientErrorException{
 		var updateProject = projectService.update(id, project);
 		return updateProject;
