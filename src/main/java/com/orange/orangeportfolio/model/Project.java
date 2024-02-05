@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -12,7 +11,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
@@ -52,7 +50,6 @@ public class Project {
 	private String link;
 	
 	@ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
-	@CollectionTable(name = "tb_tags", joinColumns = @JoinColumn(name = "project_id"))
 	@Column(name = "tags", nullable = false)
 	private List<String> tags;
 	
@@ -60,6 +57,8 @@ public class Project {
     @JsonIgnoreProperties("projects")
 	private User user;
 	
-	
+	@ManyToOne
+    @JsonIgnoreProperties("projects")
+	private GoogleLoginUser googleLoginUser;
 	
 }

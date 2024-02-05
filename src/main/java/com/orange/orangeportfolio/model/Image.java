@@ -41,4 +41,9 @@ public class Image {
 	@JoinColumn(name="user_id")
     @JsonIgnoreProperties("images")
 	private User user;
+	
+	@ManyToOne
+	@JoinColumn(name = "google_login_user_id")
+    @JsonIgnoreProperties("images")
+	private GoogleLoginUser googleLoginUser;
 }

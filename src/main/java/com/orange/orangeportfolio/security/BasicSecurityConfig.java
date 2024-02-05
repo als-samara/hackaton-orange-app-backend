@@ -2,6 +2,8 @@ package com.orange.orangeportfolio.security;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import java.beans.Customizer;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CsrfFilter;
 
 @SuppressWarnings("deprecation")
 @Configuration
@@ -28,7 +31,7 @@ public class BasicSecurityConfig {
 
     @Autowired
     private JwtAuthFilter authFilter;
-
+    
     @Bean
     UserDetailsService userDetailsService() {
 
@@ -57,14 +60,14 @@ public class BasicSecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http
+        /*http
                 .sessionManagement(management -> management
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)).csrf(csrf -> csrf.disable())
                 .cors(withDefaults());
 
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/users/register", "/api/users/authenticate", "/error/**", "/token").permitAll()
+                        .requestMatchers("/api/users/register", "/api/users/authenticate", "/error/**", "/logingoogle").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
@@ -72,9 +75,29 @@ public class BasicSecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(withDefaults());
+        
 
-        return http.build();
+        return http.build();*/
+    	
+    	http
+        .sessionManagement(management -> management
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)).csrf(csrf -> csrf.disable())
+        .cors(withDefaults());
+
+    	http
+        .authorizeHttpRequests((auth) -> auth
+                .requestMatchers("/api/users/register", "/api/users/authenticate", "/error/**", "/logingoogle").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                .requestMatchers(HttpMethod.OPTIONS).permitAll()
+                .requestMatchers("/swagger-ui.html").permitAll()
+                .anyRequest().authenticated())
+        .authenticationProvider(authenticationProvider())
+        .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
+        .httpBasic(withDefaults());
+    	
+    	return http.build();
 
     }
+   
 
 }
