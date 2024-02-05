@@ -24,8 +24,7 @@ public class UserMapper {
 	public UserDTO toDTO(User user) {
 		var userDTO = new UserDTO(
 				user.getName(), 
-				user.getEmail(),
-				user.getPhoto());
+				user.getEmail());
 				
 		return userDTO;
 	}
