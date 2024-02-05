@@ -57,7 +57,4 @@ public class User {
 	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
 	private List<Image> images;
-	@JsonIgnoreProperties("user")
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
-	private List<Image> images;
 }
