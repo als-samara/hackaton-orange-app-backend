@@ -8,7 +8,7 @@ import org.springframework.web.client.HttpClientErrorException;
 public class UserUnauthorizedException extends HttpClientErrorException{
 
 	private static final long serialVersionUID = 1L;
-	private static final String defaultMessage = "You cannot update or delete another user.";
+	private static final String defaultMessage = "You don´t have permission.";
 
 	public UserUnauthorizedException() {
 		super(HttpStatus.UNAUTHORIZED, defaultMessage);

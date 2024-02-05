@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 
+import com.orange.orangeportfolio.dto.ProjectCreateDTO;
 import com.orange.orangeportfolio.dto.ProjectDTO;
 import com.orange.orangeportfolio.dto.ProjectUpdateDTO;
 import com.orange.orangeportfolio.model.Project;
@@ -69,7 +70,7 @@ public class ProjectController {
 	}
 	
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	@PreAuthorize("@projectAuthorizationService.canDeleteProject(authentication, #id)")
+	@PreAuthorize("@projectAuthorizationService.canUpdateProject(authentication, #id)")
 	@DeleteMapping("/delete/{id}")
 	public void delete(@PathVariable Long id) throws HttpClientErrorException{
 			projectService.deleteById(id);
