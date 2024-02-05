@@ -30,6 +30,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@CrossOrigin(origins = "", allowedHeaders = "")
 public class User {
 	
 	@Id
