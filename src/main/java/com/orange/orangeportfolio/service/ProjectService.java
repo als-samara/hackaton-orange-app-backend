@@ -39,15 +39,17 @@ public class ProjectService {
 	
 	@Autowired JwtService jwtService;
 	
-	public ResponseEntity<?> createProject(Project project, String userEmail) {
+	public ResponseEntity<?> createProject(ProjectCreateDTO projectDTO, String userEmail) {
         try {
             Optional<User> user = userRepository.findByEmail(userEmail);
 
-            validateProjectProperties(project);
+            validateProjectProperties(projectDTO);
+            
+            var projectEntity = projectMapper.toProject(projectDTO);
 
-            project.setUser(user.orElseThrow(() -> new UserNotFoundException()));
+            projectEntity.setUser(user.orElseThrow(() -> new UserNotFoundException()));
 
-            Project createdProject = projectRepository.save(project);
+            Project createdProject = projectRepository.save(projectEntity);
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Projeto " + createdProject.getTitle() + " criado com sucesso!");
 
@@ -56,18 +58,18 @@ public class ProjectService {
         }
     }
 
-    private void validateProjectProperties(Project project) {
-        ProjectInvalidPropertyException.ThrowIfIsNullOrEmpty("title", project.getTitle());
-        ProjectInvalidPropertyException.ThrowIfIsNullOrEmpty("description", project.getDescription());
-        ProjectInvalidPropertyException.ThrowIfIsNullOrEmptyList("tags", project.getTags());
-        ProjectPropertyTooLongException.ThrowIfDataIsTooLong("title", project.getTitle(), 80);
-        ProjectPropertyTooLongException.ThrowIfDataIsTooLong("description", project.getDescription(), 650);
+    private void validateProjectProperties(ProjectCreateDTO project) {
+        ProjectInvalidPropertyException.ThrowIfIsNullOrEmpty("title", project.title());
+        ProjectInvalidPropertyException.ThrowIfIsNullOrEmpty("description", project.description());
+        ProjectInvalidPropertyException.ThrowIfIsNullOrEmptyList("tags", project.tags());
+        ProjectPropertyTooLongException.ThrowIfDataIsTooLong("title", project.title(), 80);
+        ProjectPropertyTooLongException.ThrowIfDataIsTooLong("description", project.description(), 650);
     }
 
 	public ProjectDTO update(Long id, ProjectUpdateDTO project) throws HttpClientErrorException{
 		
-		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.title, project.title());
-		UserInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.description, project.description());
+		ProjectInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.title, project.title());
+		ProjectInvalidPropertyException.ThrowIfIsNullOrEmpty(ProjectCreateDTO.Fields.description, project.description());
 		
 		var result = projectRepository.findById(id);
 		

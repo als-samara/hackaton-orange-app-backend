@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -38,7 +39,7 @@ public class ProjectController {
     private ProjectRepository projectRepository;
 	
 	@PostMapping("/create")
-    public ResponseEntity<?> createProject(@RequestBody Project project, HttpServletRequest request) {
+    public ResponseEntity<?> createProject(@RequestBody ProjectCreateDTO project, HttpServletRequest request) {
         String userEmail = (String) request.getAttribute("userEmail");
         return projectService.createProject(project, userEmail);
     }
@@ -60,16 +61,18 @@ public class ProjectController {
 		return project;
 	}
 	
-	@PreAuthorize("@projectAuthorizationService.canDeleteProject(authentication, #id)")
+	@PreAuthorize("@projectAuthorizationService.canUpdateProject(authentication, #id)")
 	@PutMapping("/update/{id}")
 	public ProjectDTO update(@PathVariable Long id, @RequestBody ProjectUpdateDTO project) throws HttpClientErrorException{
 		var updateProject = projectService.update(id, project);
 		return updateProject;
 	}
 	
-	@PreAuthorize("@projectAuthorizationService.canUpdateProject(authentication, #id)")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@PreAuthorize("@projectAuthorizationService.canDeleteProject(authentication, #id)")
 	@DeleteMapping("/delete/{id}")
 	public void delete(@PathVariable Long id) throws HttpClientErrorException{
-		projectService.deleteById(id);
+			projectService.deleteById(id);
 	}
+	
 }

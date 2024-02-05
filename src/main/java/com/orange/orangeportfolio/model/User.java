@@ -48,7 +48,7 @@ public class User {
 	private String password;
 	
 	@JsonIgnoreProperties("user")
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.REMOVE)
 	private List<Project> projects;
 	
 	private String photo;
