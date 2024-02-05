@@ -28,6 +28,7 @@ import com.orange.orangeportfolio.service.UserService;
 
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class UserController {
 	
 	@Autowired
