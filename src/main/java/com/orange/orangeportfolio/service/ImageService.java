@@ -83,8 +83,6 @@ public class ImageService {
 		
 		UserNotFoundException.ThrowIfIsEmpty(result);
 		
-		ValidateUser(result.get());
-		
 		var data = ImageUtils.decompressImage(image.getImageData());
 		
 		return data;
