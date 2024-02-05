@@ -3,6 +3,8 @@ package com.orange.orangeportfolio.dto;
 import lombok.experimental.FieldNameConstants;
 
 @FieldNameConstants
-public record UserDTO(
+public record ImageDTO(
+		byte[] image_data,
 		String name,
-		String email) {}
+		String type,
+		Long user_id) {}

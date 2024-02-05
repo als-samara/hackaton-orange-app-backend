@@ -28,14 +28,16 @@ import com.orange.orangeportfolio.service.UserService;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class UserController {
 	
 	@Autowired
 	private UserService userService;
 	
-	@Autowired
-	UserRepository userRepository;
+	@GetMapping("/{id}")
+	public UserDTO getById(@PathVariable Long id) throws HttpClientErrorException {
+		var user = userService.getById(id);
+		return user;
+	}
 	
 	@GetMapping
     public UserProjectDTO getByEmailWithProjects(@CurrentSecurityContext(expression="authentication.name")String email) throws HttpClientErrorException {
@@ -43,16 +45,10 @@ public class UserController {
         return userWithProjects;
     }
 	
-	@GetMapping("/user/{email}")
-	public UserDTO getByEmail(String email) {
+	@GetMapping("/user")
+	public UserDTO getByEmail(@CurrentSecurityContext(expression="authentication.name")String email) {
 		return userService.getByEmail(email);
     }
-	
-	@GetMapping("/{id}")
-	public UserDTO getById(@PathVariable Long id) throws HttpClientErrorException {
-		var user = userService.getById(id);
-		return user;
-	}
 	
 	@GetMapping("/{id}/projects")
 	public UserProjectDTO getByIdWithProjects(@PathVariable Long id) throws HttpClientErrorException {

@@ -70,7 +70,7 @@ public class ProjectController {
 	}
 	
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	@PreAuthorize("@projectAuthorizationService.canDeleteProject(authentication, #id)")
+	@PreAuthorize("@projectAuthorizationService.canUpdateProject(authentication, #id)")
 	@DeleteMapping("/delete/{id}")
 	public void delete(@PathVariable Long id) throws HttpClientErrorException{
 			projectService.deleteById(id);
