@@ -32,7 +32,9 @@ Sinta-se à vontade para incluir novas features que achar interessante. Se você
 5. Abra um Pull Request
 
 ## Deploy
-Visualize o Deploy do Back-End pelo link: https://hackaton-orange-app-backend.onrender.com/ <br>
+Visualize o Deploy do Back-End [nesse link](https://hackaton-orange-app-backend.onrender.com/)
+ <br>
+A primeira solicitação pode demorar mais tempo do que o esperado, visto que o servidor do Render fica em estado de hibernação quando não recebe solicitações em um período de 15 minutos.
 
 ## Contato
 
